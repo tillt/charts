@@ -45,7 +45,6 @@ grafana:
     secretKeyRef: ops-portal-username
     # Do not use, this will be deprecated
     serviceURL: http://kommander-kubeaddons-grafana.kommander
-    # Do not use, this will be deprecated
     kommanderServiceAccount: kommander-kubeaddons
 
   ## Do not deploy default dashboards.
@@ -185,7 +184,6 @@ portalRBAC:
 
 kubecost:
   thanosAddress: "kubecost-kubeaddons-prometheus-server.kubecost.svc.cluster.local:10901"
-  # Do not use, this will be deprecated
   kommanderServiceAccount: kommander-kubeaddons
   federate:
     addons: true
