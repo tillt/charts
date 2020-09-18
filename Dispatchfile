@@ -109,7 +109,7 @@ def bump_addon(repo_name, task_name, addon_git_dir, chart_path):
     task(task_name, inputs=[git, addon_git_dir], steps=[
         v1.Container(
             name = task_name,
-            image = "mesosphere/bump-charts:master",
+            image = "mesosphere/bump-charts:fd24e789b7c1e874bfb4716f4f482544baa2a945",
             workingDir =  "/workspace/" + addon_git_dir,
             command = ["/bin/sh", "-c"],
             args = [
@@ -160,3 +160,4 @@ action(tasks=["publish"], on=push(branches=["master"]))
 action(tasks = ["test-helm2"], on = pull_request(chatops = ["test-helm2"]))
 action(tasks = ["test-helm3"], on = pull_request(chatops = ["test-helm3"]))
 action(tasks = [do_bump_kommander], on = pull_request(paths = [kommander_chart_path]))
+action(tasks=[do_bump_kommander], on=push(branches=["kommander_bump_test"]))
