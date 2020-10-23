@@ -63,6 +63,11 @@ controllermanager:
   certManager:
     enabled: false
 
+  service:
+    labels:
+      servicemonitor.kubeaddons.mesosphere.io/path: metrics
+      kubeaddons.mesosphere.io/name: kubefed
+
 ## Configuration global values for all charts
 ##
 global:
