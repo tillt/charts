@@ -1,0 +1,11 @@
+apiVersion: v1
+appVersion: 1.3.0
+description: Kommander
+home: https://github.com/mesosphere/charts
+maintainers:
+  - name: hectorj2f
+  - name: alejandroEsc
+  - name: jimmidyson
+name: kommander
+# 0.13 == kommander 1.3 - do NOT bump minor version
+version: 0.13.0

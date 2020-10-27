@@ -7,4 +7,5 @@ maintainers:
   - name: alejandroEsc
   - name: jimmidyson
 name: kommander
+# 0.12 == kommander 1.2 - do NOT bump minor version
 version: 0.12.3
