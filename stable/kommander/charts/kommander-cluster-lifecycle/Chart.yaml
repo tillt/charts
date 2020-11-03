@@ -1,9 +1,0 @@
-apiVersion: v1
-appVersion: v0.4.12
-description: Kommander Cluster Lifecycle
-home: https://github.com/mesosphere/kommander-cluster-lifecycle
-maintainers:
-- name: jimmidyson
-- name: hectorj2f
-name: kommander-cluster-lifecycle
-version: v0.4.12

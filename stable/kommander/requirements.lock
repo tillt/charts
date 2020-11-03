@@ -15,7 +15,7 @@ dependencies:
   repository: https://mesosphere.github.io/charts/stable
   version: 0.3.8
 - name: grafana
-  repository: https://kubernetes-charts.storage.googleapis.com
+  repository: https://mesosphere.github.io/charts/stable
   version: 4.5.*
-digest: sha256:f7cc9d374fb4dd367f045be5eea190f901426d1f64ad0f647565511ba79f6272
-generated: "2020-07-15T18:23:46.982990927-05:00"
+digest: sha256:648f75d77b08e76d6e26be7fd7f9754517402a5c964692db92eb0a98d27fc8ae
+generated: "2020-11-02T16:56:04.743609987-08:00"
