@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if .Values.terraformBackend.service.annotations }}
+  annotations:
+    {{ toYaml .Values.terraformBackend.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "kommander-cluster-lifecycle.commonLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: {{.Values.terraformBackend.service.type}}
+  ports:
+  - name: https
+    port: {{ .Values.terraformBackend.service.port }}
+    protocol: TCP
+    targetPort: https
+    {{- if and .Values.terraformBackend.service.nodePort (eq "NodePort" .Values.terraformBackend.service.type) }}
+    nodePort: {{ .Values.terraformBackend.service.nodePort }}
+    {{- end }}
+  selector:
+    {{- include "kommander-cluster-lifecycle.commonSelectorLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb

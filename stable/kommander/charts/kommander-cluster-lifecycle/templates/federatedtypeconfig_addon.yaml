@@ -1,0 +1,24 @@
+---
+apiVersion: core.kubefed.io/v1beta1
+kind: FederatedTypeConfig
+metadata:
+  finalizers:
+  - core.kubefed.io/federated-type-config
+  generation: 1
+  name: addons.kubeaddons.mesosphere.io
+  labels:
+    {{- include "kommander-cluster-lifecycle.commonLabels" . | nindent 4 }}
+spec:
+  federatedType:
+    group: types.kubefed.io
+    kind: FederatedAddon
+    pluralName: federatedaddons
+    scope: Namespaced
+    version: v1beta1
+  propagation: Enabled
+  targetType:
+    group: kubeaddons.mesosphere.io
+    kind: Addon
+    pluralName: addons
+    scope: Namespaced
+    version: v1beta1

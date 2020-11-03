@@ -1,0 +1,109 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  annotations:
+    certmanager.k8s.io/inject-ca-from: {{ .Release.Namespace }}/{{ template "kommander-cluster-lifecycle.fullname" . }}-webhook-tls
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-validating
+  labels:
+    {{- include "kommander-cluster-lifecycle.commonLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-webhook
+webhooks:
+  - clientConfig:
+      service:
+        name: kubernetes
+        namespace: default
+        path: /apis/webhook.kommander.mesosphere.io/v1beta1/validations
+    failurePolicy: Fail
+    name: webhook.kommander.mesosphere.io
+    rules:
+      - apiGroups:
+          - kommander.mesosphere.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - cloudprovideraccounts
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - DELETE
+        resources:
+          - secrets
+      - apiGroups:
+          - kommander.mesosphere.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - licenses
+      - apiGroups:
+          - kommander.mesosphere.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - kommandercluster
+      - apiGroups:
+          - kommander.mesosphere.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - konvoyclusters
+      - apiGroups:
+          - kommander.mesosphere.io
+        apiVersions:
+          - v1beta1
+        operations:
+          - CREATE
+          - UPDATE
+          - DELETE
+        resources:
+          - virtualgroups
+      - apiGroups:
+          - "types.kubefed.io"
+        apiVersions:
+          - v1beta1
+        operations:
+          - DELETE
+        resources:
+          - federatedclusterroles
+    sideEffects: None
+  - clientConfig:
+      service:
+        name: kubernetes
+        namespace: default
+        path: /apis/webhook.workspaces.kommander.mesosphere.io/v1alpha1/validations
+    failurePolicy: Fail
+    name: webhook.workspaces.kommander.mesosphere.io
+    rules:
+      - apiGroups:
+          - workspaces.kommander.mesosphere.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - projects
+          - workspaces
+      - apiGroups:
+          - workspaces.kommander.mesosphere.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - DELETE
+        resources:
+          - projectroles
+          - workspaceroles
+    sideEffects: None

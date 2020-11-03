@@ -1,0 +1,14 @@
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRoleBinding
+metadata:
+  name: ops-portal-user-kommander
+spec:
+  template:
+    subjects: []
+    roleRef:
+      kind: ClusterRole
+      name: cluster-admin
+      apiGroup: rbac.authorization.k8s.io
+  placement:
+    clusterSelector:
+      matchLabels: {}

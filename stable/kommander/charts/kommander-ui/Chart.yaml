@@ -1,0 +1,8 @@
+apiVersion: v1
+appVersion: 2.39.6
+description: Kommander UI
+home: https://github.com/mesosphere/kommander
+maintainers:
+- name: DanielMSchmidt
+name: kommander-ui
+version: 2.39.6

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "kommander-cluster-lifecycle.commonLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.terraformBackend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "kommander-cluster-lifecycle.commonSelectorLabels" . | nindent 6 }}
+      control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb
+  template:
+    metadata:
+      labels:
+        {{- include "kommander-cluster-lifecycle.commonSelectorLabels" . | nindent 8 }}
+        control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb
+    spec:
+      nodeSelector:
+        {{- toYaml .Values.commonNodeSelector | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.commonTolerations | nindent 8 }}
+      serviceAccountName: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: server
+        image: "{{ .Values.terraformBackend.image.repository }}:{{ .Values.terraformBackend.image.tag }}"
+        imagePullPolicy: "{{ .Values.terraformBackend.image.pullPolicy }}"
+        args:
+        - --compress-state
+        - --minify-state
+        - --tls-cert-file=/tmp/terraform-configmap-backend/serving-certs/tls.crt
+        - --tls-private-key-file=/tmp/terraform-configmap-backend/serving-certs/tls.key
+        ports:
+        - containerPort: 8443
+          name: https
+        resources:
+          {{ with .Values.terraformBackend.resources }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+        - mountPath: /tmp/terraform-configmap-backend/serving-certs
+          name: cert
+          readOnly: true
+      securityContext:
+        {{ with .Values.terraformBackend.securityContext }}
+        {{- toYaml . | nindent 8}}
+        {{- end }}
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: {{ template "kommander-cluster-lifecycle.fullname" . }}-tfcb-tls

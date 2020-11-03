@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-leader-election
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kommander-cluster-lifecycle.commonLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-cm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-leader-election
+subjects:
+- kind: ServiceAccount
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-cm
+  namespace: {{ .Release.Namespace }}

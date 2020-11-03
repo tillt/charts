@@ -1,0 +1,14 @@
+{{- if .Values.federate.systemNamespace.enable -}}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedNamespace
+metadata:
+  name: {{ .Values.federate.systemNamespace.name }}
+  namespace: {{ .Values.federate.systemNamespace.name }}
+spec:
+  placement:
+    clusterSelector:
+      matchLabels: {}
+  template:
+    spec: {}
+{{- end -}}

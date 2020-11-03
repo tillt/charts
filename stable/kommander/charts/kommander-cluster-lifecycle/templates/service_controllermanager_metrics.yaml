@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "{{ .Values.controller.service.port }}"
+    prometheus.io/scheme: https
+    prometheus.io/scrape: "true"
+    {{- if .Values.controller.service.annotations }}
+    {{ toYaml .Values.controller.service.annotations | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "kommander-cluster-lifecycle.commonLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-cm-metrics
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-cm-metrics
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: {{.Values.controller.service.type}}
+  ports:
+  - name: https
+    port: {{ .Values.controller.service.port }}
+    protocol: TCP
+    targetPort: https
+    {{- if and .Values.controller.service.nodePort (eq "NodePort" .Values.controller.service.type) }}
+    nodePort: {{ .Values.controller.service.nodePort }}
+    {{- end }}
+  selector:
+    {{- include "kommander-cluster-lifecycle.commonSelectorLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-cm-metrics

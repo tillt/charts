@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    {{- include "kommander-cluster-lifecycle.commonLabels" . | nindent 4 }}
+    control-plane: {{ template "kommander-cluster-lifecycle.fullname" . }}-cm
+  name: {{ template "kommander-cluster-lifecycle.fullname" . }}-cm
+  namespace: {{ .Release.Namespace }}

@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: one-license-per-cluster
+  namespace: {{ .Release.Namespace }}
+spec:
+  hard:
+    count/licenses.kommander.mesosphere.io: 1

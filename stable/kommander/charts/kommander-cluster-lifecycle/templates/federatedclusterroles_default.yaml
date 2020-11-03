@@ -1,0 +1,517 @@
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+      kommander.mesosphere.io/display-name: "Cluster Admin Role"
+      kommander/description: "This roles sets cluster admin permissions"
+  name: kommander-cluster-admin
+spec:
+  template:
+    metadata:
+      name: kommander-cluster-admin
+    rules:
+    - apiGroups:
+      - '*'
+      resources:
+      - '*'
+      verbs:
+      - '*'
+    - nonResourceURLs:
+      - '*'
+      verbs:
+      - '*'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+      kommander.mesosphere.io/display-name: "Admin Role"
+      kommander/description: "This role sets admin permissions"
+  name: kommander-admin
+spec:
+  template:
+    metadata:
+      name: kommander-admin
+    aggregationRule:
+      clusterRoleSelectors:
+      - matchLabels:
+          rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rules: null
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+      kommander.mesosphere.io/display-name: "View Role"
+      kommander/description: "This role sets view only permissions"
+  name: kommander-view
+spec:
+  template:
+    metadata:
+      name: kommander-view
+    aggregationRule:
+      clusterRoleSelectors:
+      - matchLabels:
+          rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rules: null
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+      kommander.mesosphere.io/display-name: "Edit Role"
+      kommander/description: "This role sets edit permissions"
+  name: kommander-edit
+spec:
+  template:
+    metadata:
+      name: kommander-edit
+    aggregationRule:
+      clusterRoleSelectors:
+      - matchLabels:
+          rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rules: null
+  placement:
+    clusterSelector:
+      matchLabels: {}
+
+## Default federated dashboard roles
+#
+# TODO(jr): consolidate roles and overrides.
+# potentially rely on catalog to determine what roles should be federated and what
+# ingress routes should be overridden.
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Dashboard Admin Role"
+    kommander/description: "This roles grants admin permissions to downstream dashboards"
+  name: kommander-dashboard-admin
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-admin
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal'
+          - '/ops/portal/*'
+        verbs:
+          - '*'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Dashboard Edit Role"
+    kommander/description: "This roles grants edit permissions to downstream dashboards"
+  name: kommander-dashboard-edit
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-edit
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal'
+          - '/ops/portal/*'
+        verbs:
+          - 'get'
+          - 'head'
+          - 'post'
+          - 'put'
+          - 'patch'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Dashboard View Role"
+    kommander/description: "This roles grants view permissions to downstream dashboards"
+  name: kommander-dashboard-view
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-view
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal'
+          - '/ops/portal/*'
+        verbs:
+          - 'get'
+          - 'head'
+      # Posting to graphql is required for ops portal viewing
+      - nonResourceURLs:
+          - /ops/portal/graphql
+        verbs:
+          - get
+          - head
+          - post
+  placement:
+    clusterSelector:
+      matchLabels: {}
+
+## Kibana
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Kibana Admin Role"
+    kommander/description: "This roles grants admin permissions to downstream kibana dashboard"
+  name: kommander-dashboard-kibana-admin
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-kibana-admin
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/kibana'
+          - '/ops/portal/kibana/*'
+        verbs:
+          - '*'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Kibana Edit Role"
+    kommander/description: "This roles grants edit permissions to downstream kibana dashboard"
+  name: kommander-dashboard-kibana-edit
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-kibana-edit
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/kibana'
+          - '/ops/portal/kibana/*'
+        verbs:
+          - 'post'
+          - 'put'
+          - 'patch'
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Kibana View Role"
+    kommander/description: "This roles grants view permissions to downstream kibana dashboard"
+  name: kommander-dashboard-kibana-view
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-kibana-view
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/kibana'
+          - '/ops/portal/kibana/*'
+        verbs:
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+
+## Alert Manager
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Alert Manager Admin Role"
+    kommander/description: "This roles grants admin permissions to downstream alertmanager dashboard"
+  name: kommander-dashboard-alertmanager-admin
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-alertmanager-admin
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/alertmanager'
+          - '/ops/portal/alertmanager/*'
+        verbs:
+          - '*'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Alert Manager Edit Role"
+    kommander/description: "This roles grants edit permissions to downstream alertmanager dashboard"
+  name: kommander-dashboard-alertmanager-edit
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-alertmanager-edit
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/alertmanager'
+          - '/ops/portal/alertmanager/*'
+        verbs:
+          - 'post'
+          - 'put'
+          - 'patch'
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Alert Manager View Role"
+    kommander/description: "This roles grants view permissions to downstream alertmanager dashboard"
+  name: kommander-dashboard-alertmanager-view
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-alertmanager-view
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/alertmanager'
+          - '/ops/portal/alertmanager/*'
+        verbs:
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+
+## Grafana
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Grafana Admin Role"
+    kommander/description: "This roles grants admin permissions to downstream grafana dashboard"
+  name: kommander-dashboard-grafana-admin
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-grafana-admin
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/grafana'
+          - '/ops/portal/grafana/*'
+        verbs:
+          - '*'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Grafana Edit Role"
+    kommander/description: "This roles grants edit permissions to downstream grafana dashboard"
+  name: kommander-dashboard-grafana-edit
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-grafana-edit
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/grafana'
+          - '/ops/portal/grafana/*'
+        verbs:
+          - 'post'
+          - 'put'
+          - 'patch'
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Grafana View Role"
+    kommander/description: "This roles grants view permissions to downstream grafana dashboard"
+  name: kommander-dashboard-grafana-view
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-grafana-view
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/grafana'
+          - '/ops/portal/grafana/*'
+        verbs:
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+
+## Prometheus
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Prometheus Admin Role"
+    kommander/description: "This roles grants admin permissions to downstream prometheus dashboard"
+  name: kommander-dashboard-prometheus-admin
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-prometheus-admin
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/prometheus'
+          - '/ops/portal/prometheus/*'
+        verbs:
+          - '*'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Prometheus Edit Role"
+    kommander/description: "This roles grants edit permissions to downstream prometheus dashboard"
+  name: kommander-dashboard-prometheus-edit
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-prometheus-edit
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/prometheus'
+          - '/ops/portal/prometheus/*'
+        verbs:
+          - 'post'
+          - 'put'
+          - 'patch'
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Prometheus View Role"
+    kommander/description: "This roles grants view permissions to downstream prometheus dashboard"
+  name: kommander-dashboard-prometheus-view
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-prometheus-view
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/prometheus'
+          - '/ops/portal/prometheus/*'
+        verbs:
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+
+## Traefik
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Traefik Admin Role"
+    kommander/description: "This roles grants admin permissions to downstream traefik dashboard"
+  name: kommander-dashboard-traefik-admin
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-traefik-admin
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/traefik'
+          - '/ops/portal/traefik/*'
+        verbs:
+          - '*'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Traefik Edit Role"
+    kommander/description: "This roles grants edit permissions to downstream traefik dashboard"
+  name: kommander-dashboard-traefik-edit
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-traefik-edit
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/traefik'
+          - '/ops/portal/traefik/*'
+        verbs:
+          - 'post'
+          - 'put'
+          - 'patch'
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}
+---
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedClusterRole
+metadata:
+  annotations:
+    kommander.mesosphere.io/display-name: "Traefik View Role"
+    kommander/description: "This roles grants view permissions to downstream traefik dashboard"
+  name: kommander-dashboard-traefik-view
+spec:
+  template:
+    metadata:
+      name: kommander-dashboard-traefik-view
+    rules:
+      - nonResourceURLs:
+          - '/ops/portal/traefik'
+          - '/ops/portal/traefik/*'
+        verbs:
+          - 'get'
+          - 'head'
+  placement:
+    clusterSelector:
+      matchLabels: {}

@@ -1,0 +1,4 @@
+dependencies:
+- name: kubefed
+  version: "0.0.3"
+  repository: "https://mesosphere.github.io/charts/staging"

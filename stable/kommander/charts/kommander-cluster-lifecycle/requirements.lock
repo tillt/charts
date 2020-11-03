@@ -1,0 +1,6 @@
+dependencies:
+- name: kubefed
+  repository: https://mesosphere.github.io/charts/staging
+  version: 0.0.3
+digest: sha256:d567431582535d117b4896e2431ef1c9005d37e5c7dbc8e0e96bba21f101060a
+generated: "2020-02-07T14:53:43.971961-08:00"
