@@ -64,4 +64,4 @@ dindTask("test", inputs=[git], deps=["lint"], steps=[
 ])
 
 action(tasks=["test"], on=pullRequest(branches=["*"]))
-action(tasks=["publish"], on=push(branches=["master"]))
+action(tasks=["publish"], on=push(branches=["release/kommander-0.4.x"]))
