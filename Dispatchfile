@@ -1,67 +1,105 @@
-#!starlark
+#!mesosphere/dispatch-starlark:v0.5-beta2
 # vi:syntax=python
 #
 
-git = "src-git"
 
-def secretVar(name, key):
-    return k8s.corev1.EnvVarSource(secretKeyRef=k8s.corev1.SecretKeySelector(localObjectReference=k8s.corev1.LocalObjectReference(name=name), key=key))
+load("github.com/mesosphere/dispatch-catalog/starlark/stable/pipeline@0.0.4", "gitResource", "pullRequest", "push", "secretVar")
+#TODO @faiq: once 0.0.5 of this package is released switch to that ref
+load("github.com/mesosphere/dispatch-catalog/starlark/stable/docker@dc4612e95b62ff8b744bda2e4d3c75cf2edeb694", "dind_task")
+
+git = "src-git"
 
 gitResource(git,
     url="$(context.git.url)",
     revision="$(context.git.commit)")
 
-dindTask("publish", inputs=[git], steps=[
-  v1.Container(
-    name = "publish-charts",
-    workingDir =  "/workspace/src-git",
-    args = [
-      "/bin/bash", "-c",
-      """
-      git fetch origin master --unshallow
-      export GIT_REMOTE_URL=https://mesosphere:${GITHUB_USER_TOKEN}@github.com/mesosphere/charts.git
-      git config --global user.name 'Dispatch CI'
-      git config --global user.email '56653984+d2iq-dispatch@users.noreply.github.com'
-      make publish
-      """
-    ],
-    env=[k8s.corev1.EnvVar(name="GITHUB_USER_TOKEN", valueFrom=secretVar("scmtoken", "password"))]
-  )
-])
-
-dindTask("lint", inputs=[git], steps=[
-  v1.Container(
-    name = "lint-charts",
-    workingDir =  "/workspace/src-git",
-    args = [
-      "/bin/bash", "-c",
-      """
-      git fetch origin master --unshallow
-      make lint
-      """
+dind_task("publish",
+    inputs=[git],
+    steps=[
+        v1.Container(
+            name = "publish-charts",
+            workingDir =  "/workspace/src-git",
+            args = [
+              "/bin/bash", "-c",
+              """
+              git fetch origin master --unshallow
+              export GIT_REMOTE_URL=https://mesosphere:${GITHUB_USER_TOKEN}@github.com/mesosphere/charts.git
+              git config --global user.name 'Dispatch CI'
+              git config --global user.email '56653984+d2iq-dispatch@users.noreply.github.com'
+              make publish HELM_VERSION=v2.16.9
+              """
+            ],
+            env=[k8s.corev1.EnvVar(name="GITHUB_USER_TOKEN", valueFrom=secretVar("scmtoken", "password"))]
+        )
     ]
-  )
-])
+)
 
-dindTask("test", inputs=[git], deps=["lint"], steps=[
-  v1.Container(
-    name = "test-charts",
-    workingDir =  "/workspace/src-git",
-    args = [
-      "/bin/bash", "-c",
-      """
-      git fetch origin master --unshallow
-      make test
-      """
-    ],
-    resources = k8s.corev1.ResourceRequirements(
-      limits = {
-        "cpu": k8s.resource_quantity("1000m"),
-        "memory": k8s.resource_quantity("6Gi")
-      }
-    )
-  )
-])
+dind_task("lint",
+    inputs=[git],
+    steps=[
+        v1.Container(
+            name = "lint-charts",
+            workingDir =  "/workspace/src-git",
+            args = [
+              "/bin/bash", "-c",
+              """
+              git fetch origin master --unshallow
+              make lint
+              """
+            ]
+        )
+    ]
+)
 
-action(tasks=["test"], on=pullRequest(branches=["*"]))
-action(tasks=["publish"], on=push(branches=["master"]))
+dind_task("test-helm2",
+    inputs=[git],
+    deps=["lint"],
+    steps=[
+      v1.Container(
+          name = "charts-helm2",
+          workingDir =  "/workspace/src-git",
+          args = [
+            "/bin/bash", "-c",
+            """
+            git fetch origin master --unshallow
+            make test.helm2
+            """
+          ],
+          resources = k8s.corev1.ResourceRequirements(
+            limits = {
+              "cpu": k8s.resource_quantity("1500m"),
+              "memory": k8s.resource_quantity("6Gi")
+            }
+          )
+      )
+  ]
+)
+
+dind_task("test-helm3",
+    inputs=[git],
+    deps=["lint"],
+    steps=[
+      v1.Container(
+          name = "charts-helm3",
+          workingDir =  "/workspace/src-git",
+          args = [
+            "/bin/bash", "-c",
+            """
+            git fetch origin master --unshallow
+            make test.helm3
+            """
+          ],
+          resources = k8s.corev1.ResourceRequirements(
+            limits = {
+              "cpu": k8s.resource_quantity("1500m"),
+              "memory": k8s.resource_quantity("6Gi")
+            }
+          )
+      )
+  ]
+)
+
+action(tasks=["test-helm2","test-helm3"], on=pullRequest())
+action(tasks=["publish"], on=push(branches=["master","release/prometheus/8.8"]))
+action(tasks = ["test-helm2"], on = pullRequest(chatops = ["test-helm2"]))
+action(tasks = ["test-helm3"], on = pullRequest(chatops = ["test-helm3"]))
